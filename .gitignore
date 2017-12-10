@@ -142,3 +142,5 @@ ENV/
 config.json
 
 .DS_Store
+elasticsearch-6.0.1/
+tags

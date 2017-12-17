@@ -28,3 +28,4 @@ for json_file in os.listdir(data_path):
     print(words_id, words['_id'])
 
 
+

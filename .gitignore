@@ -148,3 +148,6 @@ db/
 *.swp
 .adminpwd
 .userpwd
+keyfile
+.rootpwd
+oplog.timestamp

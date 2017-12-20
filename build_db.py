@@ -12,9 +12,10 @@ if len(sys.argv) < 4:
 
 data_path = sys.argv[1]
 username = urllib.parse.quote_plus(sys.argv[2])
-password = urllib.parse.quote_plus(open(sys.argv[3], 'r').readline().strip())
-print(password)
+password = urllib.parse.quote_plus(sys.argv[3])
+
 client = pymongo.MongoClient(
+    host=['localhost:37017'],
     username=username,
     password=password,
 )
@@ -22,11 +23,22 @@ client = pymongo.MongoClient(
 db = client['samples']
 words = db.words
 
-for json_file in os.listdir(data_path):
+json_files = sorted(os.listdir(data_path))
+n_files = len(json_files)
+i = 0
+
+for json_file in json_files:
     sample_words = json.load(open(os.path.join(data_path, json_file), 'r'))
-    sample_words['_id'] = json_file.split('.')[0].strip()
-    words_id = words.insert_one(sample_words)
-    print(words_id, words['_id'])
+    to_append = {"words": []}
 
+    for word, weight in sample_words.items():
+        to_append["words"].append({"word":word, "weight":weight})    
 
+    to_append['_id'] = json_file.split('.')[0].strip()
+    words_id = words.insert_one(to_append)
+
+    i += 1
+    perc = (i / n_files) * 100 
+    if perc % 10 == 0:
+        print('Building DB: {}%'.format(perc))
 

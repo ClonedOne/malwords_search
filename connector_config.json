@@ -1,0 +1,13 @@
+{    
+"docManagers": [
+  {
+    "docManager": "elastic2_doc_manager",
+    "targetURL": "localhost:9200",
+    "args": {
+      "clientOptions": {
+        "timeout": 1000
+      }
+    }
+  }
+]
+}

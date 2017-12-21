@@ -14,4 +14,8 @@ chown 999:999 keyfile
 sh start_replicas.sh
 # use the settings in connector_config.json (insert pwd)
 sh configuration.sh
+cd _site
+http-server
 ```
+
+The front end is built using [Calaca](https://github.com/romansanchez/Calaca) and served with [http-server](https://github.com/indexzero/http-server) using Node.js.

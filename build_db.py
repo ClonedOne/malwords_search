@@ -29,10 +29,10 @@ i = 0
 
 for json_file in json_files:
     sample_words = json.load(open(os.path.join(data_path, json_file), 'r'))
-    to_append = {"words": []}
+    to_append = {}
 
     for word, weight in sample_words.items():
-        to_append["words"].append({"word":word, "weight":weight})    
+        to_append[word] = weight
 
     to_append['_id'] = json_file.split('.')[0].strip()
     words_id = words.insert_one(to_append)

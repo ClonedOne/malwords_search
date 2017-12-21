@@ -19,7 +19,7 @@ rs.initiate({
 
 use admin
 use admin
-db.createUser({ user: "root", pwd: "BIGrootp4ass", roles: ["root"] });
-db.auth("root", "BIGrootp4ass");
+db.createUser({ user: "root", pwd: "", roles: ["root"] });
+db.auth("root", "");
 exit
 

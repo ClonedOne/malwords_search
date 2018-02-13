@@ -4,46 +4,43 @@ module.exports = {
   /** Query ES index for the provided term */
   queryTerm (term, offset = 0) {
     const body = {
-    from: offset,
-    // "_source": {
-    //     "exclude": [ "content" ]
-    // },
+    from: offset, 
+    "_source": {
+        "exclude": [ "content" ]
+    },
+
     "query": {
-      "function_score": {
-        "query": {
-          "nested": {
-            "path": "content",
-            "query": {
-              "bool": {
-                "must": [{
-                  "exists": {
-                    "field": "content." + term
+        "nested": {
+          "path": "content",
+          "query": {
+            "function_score": {
+              "query": {
+                "bool": {
+                  "must": [
+                    {
+                      "exists": {
+                         "field": "content." + term
+                        }
+                    }
+                  ]
+                }
+              },
+              "boost_mode": "replace",
+              "functions": [
+                {
+                  "field_value_factor": {
+                    "field": "content." + term,
+                    "factor": 1,
+                    "missing": 0
                   }
-                }]
-              }
+                }
+              ]
             }
           }
-        },
-        "functions": [{
-          "field_value_factor": {
-            field: "content." + term,
-            missing: 1
-          }
-        }]
+        }
       }
+
     }
-  }
-      // query: {
-      //   function_score: {
-      //     query: { exists: { field: term } },
-      //     field_value_factor: {
-      //       field: term,
-      //       missing: 0
-      //     }
-      //   }
-      // },
-      //
-      // highlight: { fields: { text: {} } }
 
     return client.search({ index, type, body })
   },

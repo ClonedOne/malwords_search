@@ -1,0 +1,148 @@
+  // query: {                                  
+  //   nested: {                               
+  //     path: "words",                        
+  //     query: {                              
+  //        function_score: {                  
+  //          query: {                         
+  //            exists: {                      
+  //              field: term                  
+  //            }                              
+  //          }                                
+  //        },                                 
+  //        functions: [{                      
+  //          field_value_factor: {            
+  //            field: term,                   
+  //            factor: 10,                    
+  //            missing: 1                     
+  //          }                                
+  //        }]                                 
+  //     }                                     
+  //   }                                       
+  // },                                        
+/ }                                            
+  "query": {                                   
+        "nested": {                            
+          "path": "words",                     
+          "query": {                           
+            "function_score": {                
+              "query": {                       
+                "exists": {                    
+                  "field": term                
+                }                              
+              },                               
+              "functions": [                   
+                {                              
+                  "field_value_factor": {      
+                     field: term,              
+                     missing: 1                
+                  }                            
+                }                              
+              ]                                
+            }                                  
+          }                                    
+        }                                      
+  },                                           
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = {
+  /** Query ES index for the provided term */
+  queryTerm (term, offset = 0) {
+    const body = {
+      from: offset,
+      // query: {
+        // function_score: {
+          // query: {
+          //   match: {
+          //     text: {
+          //       query: term,
+          //       operator: 'and',
+          //       fuzziness: 0,
+          //       max_expansions: 1,
+          //       prefix_length: 3
+          //     }
+          //   }
+          // },
+      query: {
+        function_score: {
+         query: {
+           exists: {
+             field: term
+           }
+         }
+        },
+        functions: [{
+         field_value_factor: {
+           field: term,
+           missing: 1
+         }
+        }]
+      },
+   // }
+      // "query": {
+      //       "nested": {
+      //         "path": "words",
+      //         "query": {
+      //           "function_score": {
+      //             "query": {
+      //               "exists": {
+      //                 "field": term
+      //               }
+      //             },
+      //             "functions": [
+      //               {
+      //                 "field_value_factor": {
+      //                    field: term,
+      //                    missing: 1
+      //                 }
+      //               }
+      //             ]
+      //           }
+      //         }
+      //       }
+      // }, 
+      highlight: { fields: { text: {} } }
+    }
+
+    return client.search({ index, type, body })
+  },
+
+
+
+
+
+
+
+
+
+  /** index the book data in Elasticsearch */
+async function insertData (uuid, words, aggregate, label) {
+  esConnection.client.index({
+      index: 'malwords',
+      type: 'samples',
+      id: uuid,
+      body: {
+        content: words, 
+        family: label
+      }
+  }, function(err,resp,status) {
+    console.log(resp);
+    console.log(err);
+    console.log(status);
+  });
+
+}
+
+
+
+  // Generate aggregate content
+  const aggregate = Object.keys(words).join(' ')

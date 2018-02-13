@@ -151,3 +151,8 @@ db/
 keyfile
 .rootpwd
 oplog.timestamp
+
+medium
+small
+malwords
+books

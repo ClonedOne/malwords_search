@@ -29,13 +29,6 @@ app.use(async (ctx, next) => {
 
 // ENDPOINTS
 
-/**
- * GET /search
- * Search for a term in the library
- * Query Params -
- * term: string under 60 characters
- * offset: positive integer
- */
 router.get('/search',
   validate({
     query: {
@@ -49,25 +42,16 @@ router.get('/search',
   }
 )
 
-/**
- * GET /paragraphs
- * Get a range of paragraphs from the specified book
- * Query Params -
- * bookTitle: string under 256 characters
- * start: positive integer
- * end: positive integer greater than start
- */
-router.get('/paragraphs',
+
+router.get('/details',
   validate({
     query: {
-      bookTitle: joi.string().max(256).required(),
-      start: joi.number().integer().min(0).default(0),
-      end: joi.number().integer().greater(joi.ref('start')).default(10)
+      docId: joi.string().max(256).required()
     }
   }),
   async (ctx, next) => {
-    const { bookTitle, start, end } = ctx.request.query
-    ctx.body = await search.getParagraphs(bookTitle, start, end)
+    const docId = ctx.request.query
+    ctx.body = await search.getDetails(docId)
   }
 )
 

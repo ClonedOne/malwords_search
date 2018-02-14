@@ -46,16 +46,14 @@ module.exports = {
   },
 
   /** Get the specified range of paragraphs from a book */
-  getParagraphs (bookTitle, startLocation, endLocation) {
-    const filter = [
-      { term: { title: bookTitle } },
-      { range: { location: { gte: startLocation, lte: endLocation } } }
-    ]
-
+  getDetails (param) {
+    console.log(param)
     const body = {
-      size: endLocation - startLocation,
-      sort: { location: 'asc' },
-      query: { bool: { filter } }
+      "query": {
+        "terms": {
+          "_id": [param['docId']]
+        }
+      }
     }
 
     return client.search({ index, type, body })

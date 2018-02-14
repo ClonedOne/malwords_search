@@ -53,38 +53,25 @@ const vm = new Vue ({
       document.documentElement.scrollTop = 0
     },
     /** Call the API to get current page of paragraphs */
-    async getParagraphs (bookTitle, offset) {
+    async getDetails (docId) {
       try {
-        this.bookOffset = offset
-        const start = this.bookOffset
-        const end = this.bookOffset + 10
-        const response = await axios.get(`${this.baseUrl}/paragraphs`, { params: { bookTitle, start, end } })
+        const response = await axios.get(`${this.baseUrl}/details`, { params: {docId} })
         return response.data.hits.hits
       } catch (err) {
         console.error(err)
       }
     },
-    /** Get next page (next 10 paragraphs) of selected book */
-    async nextBookPage () {
-      this.$refs.bookModal.scrollTop = 0
-      this.paragraphs = await this.getParagraphs(this.selectedParagraph._source.title, this.bookOffset + 10)
-    },
-    /** Get previous page (previous 10 paragraphs) of selected book */
-    async prevBookPage () {
-      this.$refs.bookModal.scrollTop = 0
-      this.paragraphs = await this.getParagraphs(this.selectedParagraph._source.title, this.bookOffset - 10)
-    },
-    /** Display paragraphs from selected book in modal window */
+    /** Display details for the selected document in modal window */
     async showBookModal (searchHit) {
       try {
         document.body.style.overflow = 'hidden'
-        this.selectedParagraph = searchHit
-        this.paragraphs = await this.getParagraphs(searchHit._source.title, searchHit._source.location - 5)
+        this.selectedParagraph = searchHit._id
+        this.paragraphs = await this.getDetails(searchHit._id)
       } catch (err) {
         console.error(err)
       }
     },
-    /** Close the book detail modal */
+    /** Close the document detail modal */
     closeBookModal () {
       document.body.style.overflow = 'auto'
       this.selectedParagraph = null

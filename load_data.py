@@ -18,7 +18,9 @@ conn_conf = {
 
 index_settings = {
     "index.mapping.total_fields.limit": 500000,
-    # "index.codec": "best_compression"
+    "number_of_shards" : 1, 
+    "number_of_replicas" : 0,
+    "index.codec": "best_compression"
 } 
 
 mapping_schema = {

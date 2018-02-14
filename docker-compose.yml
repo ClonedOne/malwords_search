@@ -30,8 +30,8 @@ services:
     volumes: # Persist ES data in seperate "esdata" volume
       - esdata:/usr/share/elasticsearch/data
     environment:
-      # - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms8g -Xmx8g"
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms7g -Xmx7g"
       - discovery.type=single-node
     ports: # Expose Elasticsearch ports
       - "9300:9300"

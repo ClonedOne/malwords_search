@@ -32,7 +32,7 @@ const vm = new Vue ({
         this.numHits = 0
         return
       }
-      const response = await axios.get(`${this.baseUrl}/search`, { params: { term: this.searchTerm.toUpperCase(), offset: this.searchOffset } })
+      const response = await axios.get(`${this.baseUrl}/search`, { params: { term: this.searchTerm, offset: this.searchOffset } })
       this.numHits = response.data.hits.total
       return response.data.hits.hits
     },

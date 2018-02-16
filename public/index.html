@@ -65,8 +65,21 @@
 
         <!-- Docuemnt content -->
         <div class="mui--text-body1">
+          {{ paragraphs[0]._source.syscalls }}
+        </div>
+        <br>
+        <div class="mui-divider"></div>
+        <br>
+        <div class="mui--text-body1">
           {{ paragraphs[0]._source.content }}
         </div>
+        <br>
+        <div class="mui-divider"></div>
+        <br>
+        <div class="mui--text-body1">
+          {{ paragraphs[0]._source.raw }}
+        </div>
+
         <br>
      </div>
 

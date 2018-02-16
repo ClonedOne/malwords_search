@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch, helpers
+import subprocess
 import json
 import os
 
@@ -7,6 +8,8 @@ type_name = 'samples'
 port_num = 9200
 host = 'localhost'
 data_dir = 'malwords'
+analysis_dir = 'analysis'
+raw_dir = 'raw'
 labels_file = 'labels.json'
 md5_file = 'uuid_md5_map.json'
 
@@ -26,7 +29,11 @@ index_settings = {
 mapping_schema = {
     "content": {
         "type": 'text',
-        "analyzer": "whitespace"
+        "analyzer": "pattern"
+    },
+    "syscalls": {
+        "type": "text",
+        "analyzer": "simple"
     },
     "family": {"type": 'keyword'},
     "md5": {"type": 'keyword'}
@@ -59,6 +66,12 @@ def load_data(es):
     dir_files = [os.path.join(data_dir, i) for i in os.listdir(data_dir)]
     print('Found {} files to index.'.format(len(dir_files)))
 
+    analysis_files = set([i.split('.')[0] for i in os.listdir(analysis_dir)])
+    print('Found {} analysis files.'.format(len(analysis_files)))
+
+    raw_files = set([i.split('_')[0] for i in os.listdir(raw_dir)])
+    print('Found {} raw files.'.format(len(raw_files)))
+
     # Set insert-friendly settings
     es.indices.put_settings(
         index=index_name,
@@ -68,7 +81,14 @@ def load_data(es):
     )
     
     # Perform bulk insert
-    bulk_insert(es, family_names, dir_files, md5_map)
+    bulk_insert(
+        es, 
+        family_names,
+        dir_files,
+        md5_map,
+        analysis_files,
+        raw_files
+    )
 
     # Set search-friendly settings
     es.indices.put_settings(
@@ -79,19 +99,52 @@ def load_data(es):
     )
  
 
-def gen_data(dir_files, family_names, md5_map):
+def gen_data(dir_files, family_names, md5_map, analysis_files, raw_files):
     # Scan through the files
     for file_path in dir_files:
         # Obtain the words dictionary
         words = json.load(open(file_path, 'r'), encoding='utf-8')
-
         words = ' '.join(list(words.keys()))
+
+        # Initialize variables
+        syscalls = ''
+        raw = ''
 
         # Obtain the family label
         uuid = os.path.split(file_path)[1]
-        if uuid not in family_names or uuid not in md5_map:
-            print('Missing key:', uuid)
+
+        # Check available data
+        if uuid not in family_names:
+            print('Missing family name:', uuid)
             continue
+        if uuid not in md5_map:
+            print('Missing md5:', uuid)
+            continue
+
+        if uuid in analysis_files:
+            analysis = json.load(
+                open(os.path.join(analysis_dir, uuid + '.json'), 'r')
+            )
+
+            syscalls = set()
+            for process, prc_dict in analysis.get('corrupted_processes', {}).items():
+                syscalls |= set(prc_dict.get('system_calls', {}).keys())
+
+            syscalls = ' '.join(syscalls)
+        else:
+            print('missing analysis:', uuid)
+
+        if uuid in raw_files:
+            raw_file = os.path.join(raw_dir, uuid + '_ss.txt.gz')
+            proc = subprocess.Popen(
+                ['gzip', '-cdfq', raw_file], stdout=subprocess.PIPE, bufsize=4096
+            )
+            lines = proc.stdout
+            raw = ' '.join(raw)
+        else:
+            print('missing raw:', uuid)
+
+
         label = family_names[uuid]
         md5_hash = md5_map[uuid]
 
@@ -99,7 +152,9 @@ def gen_data(dir_files, family_names, md5_map):
         source_dict = {
             "family": label,
             "content": words,
-            "md5": md5_hash
+            "md5": md5_hash,
+            "syscalls": syscalls,
+            "raw": raw
         }
 
         yield {
@@ -111,10 +166,10 @@ def gen_data(dir_files, family_names, md5_map):
         }
 
 
-def bulk_insert(es, family_names, dir_files, md5_map):
+def bulk_insert(es, family_names, dir_files, md5_map, analysis_files, raw_files):
     for success, info in helpers.parallel_bulk(   
         es,
-        gen_data(dir_files, family_names, md5_map),
+        gen_data(dir_files, family_names, md5_map, analysis_files, raw_files),
         chunk_size=10,
         thread_count=4,
         raise_on_exception=True,

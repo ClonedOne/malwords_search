@@ -10,9 +10,12 @@ module.exports = {
     },
 
     "query": {
-      "term" : { "content" : term } 
-    }
-
+      "multi_match" : {
+          "query" : term,
+          "fields": ["content", "syscalls", "raw"]
+      } 
+    },
+    highlight: { fields: { content: {} } }
     }
 
     return client.search({ index, type, body })

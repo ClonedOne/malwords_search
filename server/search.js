@@ -10,35 +10,8 @@ module.exports = {
     },
 
     "query": {
-        "nested": {
-          "path": "content",
-          "query": {
-            "function_score": {
-              "query": {
-                "bool": {
-                  "must": [
-                    {
-                      "exists": {
-                         "field": "content." + term
-                        }
-                    }
-                  ]
-                }
-              },
-              "boost_mode": "replace",
-              "functions": [
-                {
-                  "field_value_factor": {
-                    "field": "content." + term,
-                    "factor": 1,
-                    "missing": 0
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
+      "term" : { "content" : term } 
+    }
 
     }
 

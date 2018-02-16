@@ -24,7 +24,10 @@ index_settings = {
 } 
 
 mapping_schema = {
-    "content": {"type": 'nested' },
+    "content": {
+        "type": 'text',
+        "analyzer": "whitespace"
+    },
     "family": {"type": 'keyword'},
     "md5": {"type": 'keyword'}
 }
@@ -81,6 +84,8 @@ def gen_data(dir_files, family_names, md5_map):
     for file_path in dir_files:
         # Obtain the words dictionary
         words = json.load(open(file_path, 'r'), encoding='utf-8')
+
+        words = ' '.join(list(words.keys()))
 
         # Obtain the family label
         uuid = os.path.split(file_path)[1]

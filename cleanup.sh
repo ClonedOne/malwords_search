@@ -1,5 +1,5 @@
 #!/bin/sh
 
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-docker volume prune
+docker stop mw-api mw-frontend mw-search
+docker mw-api mw-frontend mw-search
+docker volume rm malwordssearch_esdata

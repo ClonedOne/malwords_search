@@ -5,7 +5,7 @@ services:
     container_name: mw-api
     build: .
     ports:
-      - "3000:3000" # Expose API port
+      - "10000:3000" # Expose API port
       - "9229:9229" # Expose Node process debug port (disable in production)
     environment: # Set ENV vars
      - NODE_ENV=local

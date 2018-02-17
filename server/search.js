@@ -12,7 +12,7 @@ module.exports = {
     "query": {
       "multi_match" : {
           "query" : term,
-          "fields": ["content", "syscalls", "raw"]
+          "fields": ["content", "syscalls", "raw", "registry"]
       } 
     },
     highlight: { fields: { content: {} } }

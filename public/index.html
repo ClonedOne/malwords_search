@@ -64,22 +64,26 @@
         <br>
 
         <!-- Docuemnt content -->
-        <div class="mui--text-body1">
-          {{ paragraphs[0]._source.syscalls }}
-        </div>
-        <br>
-        <div class="mui-divider"></div>
-        <br>
-        <div class="mui--text-body1">
-          {{ paragraphs[0]._source.content }}
-        </div>
-        <br>
-        <div class="mui-divider"></div>
-        <br>
-        <div class="mui--text-body1">
-          {{ paragraphs[0]._source.raw }}
-        </div>
+        
+        <details>
+          <summary>System Calls</summary>
+            {{ paragraphs[0]._source.syscalls }}
+        </details>
 
+        <details>
+          <summary>Registry Keys</summary>
+            {{ paragraphs[0]._source.registry }}  
+        </details>
+
+        <details>
+          <summary>Refined Malwords</summary>
+            {{ paragraphs[0]._source.content }}
+        </details>
+
+        <details>
+          <summary>Raw Malwords</summary>
+             {{ paragraphs[0]._source.raw }}
+        </details>
         <br>
      </div>
 
@@ -89,6 +93,7 @@
       </div>
     </div>
 </div>
+
 <script src="https://cdn.muicss.com/mui-0.9.28/js/mui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.0/axios.min.js"></script>

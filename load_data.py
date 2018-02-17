@@ -29,9 +29,17 @@ index_settings = {
 mapping_schema = {
     "content": {
         "type": 'text',
-        "analyzer": "pattern"
+        "analyzer": "standard"
+    },
+    "raw": {
+        "type": 'text',
+        "analyzer": "standard"
     },
     "syscalls": {
+        "type": "text",
+        "analyzer": "simple"
+    },
+   "registry": {
         "type": "text",
         "analyzer": "simple"
     },
@@ -108,6 +116,7 @@ def gen_data(dir_files, family_names, md5_map, analysis_files, raw_files):
 
         # Initialize variables
         syscalls = ''
+        registry = ''
         raw = ''
 
         # Obtain the family label
@@ -127,10 +136,14 @@ def gen_data(dir_files, family_names, md5_map, analysis_files, raw_files):
             )
 
             syscalls = set()
+            registry = set()
+
             for process, prc_dict in analysis.get('corrupted_processes', {}).items():
                 syscalls |= set(prc_dict.get('system_calls', {}).keys())
+                registry |= set(prc_dict.get('registry_activity', {}).keys())
 
             syscalls = ' '.join(syscalls)
+            registry = ' '.join(registry)
         else:
             print('missing analysis:', uuid)
 
@@ -139,7 +152,13 @@ def gen_data(dir_files, family_names, md5_map, analysis_files, raw_files):
             proc = subprocess.Popen(
                 ['gzip', '-cdfq', raw_file], stdout=subprocess.PIPE, bufsize=4096
             )
+            raw = set()
+            
             lines = proc.stdout
+            for line in lines:
+                line = line.strip().split()
+                raw.add(line[0].decode('utf-8'))
+
             raw = ' '.join(raw)
         else:
             print('missing raw:', uuid)
@@ -154,6 +173,7 @@ def gen_data(dir_files, family_names, md5_map, analysis_files, raw_files):
             "content": words,
             "md5": md5_hash,
             "syscalls": syscalls,
+            "registry": registry,
             "raw": raw
         }
 

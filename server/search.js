@@ -4,18 +4,19 @@ module.exports = {
   /** Query ES index for the provided term */
   queryTerm (term, offset = 0) {
     const body = {
-    from: offset, 
-    "_source": {
-        "exclude": [ "content" ]
-    },
+      from: offset, 
+      "_source": {
+          "exclude": ["content", "syscalls", "raw", "registry"]
+      },
 
-    "query": {
-      "multi_match" : {
-          "query" : term,
-          "fields": ["content", "syscalls", "raw", "registry"]
-      } 
-    },
-    highlight: { fields: { content: {} } }
+      "query": {
+        "multi_match" : {
+            "query" : term,
+            "fields": ["content", "syscalls", "raw", "registry"],
+            "fuzziness": 0
+        } 
+      },
+      highlight: { fields: { content: {} } }
     }
 
     return client.search({ index, type, body })

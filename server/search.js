@@ -12,16 +12,23 @@ module.exports = {
       } 
     }
 
-    if (term.split(':')[0].trim() === 'sys'){
+    var prefix = term.split(':')[0].trim() 
+    if (prefix === 'sys'){
       query_body = {
         "match" : {
-            "syscalls" : term
+            "syscalls" : {
+		"query": term.split(':')[1].trim() ,
+		"fuzziness": 0
+	    }
         }
       }
-    } else if (term.split(':')[0].trim() === 'reg'){
+    } else if (prefix === 'reg'){
       query_body = {
         "match" : {
-            "registry" : term
+            "registry" : {
+		"query": term.split(':')[1].trim(),
+		"fuzziness": 0
+	    }
         }
       }
     }
